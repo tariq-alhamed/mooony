@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إدارة المال بين المستخدمين</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background-color: #333;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    .content {
+      padding: 20px;
+    }
+    .user {
+      margin: 10px 0;
+      padding: 10px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+    }
+    .user span {
+      font-weight: bold;
+    }
+    .transaction-form {
+      margin-top: 20px;
+    }
+    .transaction-form input, .transaction-form button {
+      padding: 10px;
+      margin: 5px;
+    }
+    .add-user-form {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>إدارة المال بين المستخدمين</h1>
+  </div>
+
+  <div class="content">
+    <h2>أرصدة المستخدمين</h2>
+    <div id="users-list"></div>
+
+    <h2>إجراء عملية تحويل</h2>
+    <div class="transaction-form">
+      <label for="from-user">من:</label>
+      <select id="from-user">
+        <!-- سيتم ملء الخيارات هنا عبر الجافا سكربت -->
+      </select>
+
+      <label for="to-user">إلى:</label>
+      <select id="to-user">
+        <!-- سيتم ملء الخيارات هنا عبر الجافا سكربت -->
+      </select>
+
+      <label for="amount">المبلغ:</label>
+      <input type="number" id="amount" min="1" max="10000" placeholder="أدخل المبلغ">
+
+      <button onclick="transferMoney()">إجراء التحويل</button>
+    </div>
+
+    <h2>إضافة مستخدم جديد</h2>
+    <div class="add-user-form">
+      <input type="text" id="new-user-name" placeholder="أدخل اسم المستخدم">
+      <input type="number" id="initial-balance" placeholder="أدخل الرصيد المبدئي" value="0">
+      <button onclick="addUser()">إضافة مستخدم</button>
+    </div>
+  </div>
+
+  <script>
+    let users = [];  // بداية بدون أي مستخدمين مبدئيين
+
+    // دالة لإضافة مستخدم جديد
+    function addUser() {
+      const userName = document.getElementById("new-user-name").value.trim();
+      const initialBalance = parseFloat(document.getElementById("initial-balance").value);
+
+      if (userName === "") {
+        alert("من فضلك أدخل اسم المستخدم.");
+        return;
+      }
+
+      // التأكد من أن الاسم غير مكرر
+      if (users.some(user => user.name === userName)) {
+        alert("المستخدم موجود بالفعل.");
+        return;
+      }
+
+      // إضافة المستخدم إلى القائمة
+      users.push({ name: userName, balance: initialBalance });
+
+      // تحديث واجهة المستخدم
+      updateUserList();
+      updateUserSelectors();
+      document.getElementById("new-user-name").value = "";  // مسح حقل الاسم
+      document.getElementById("initial-balance").value = 0;  // مسح حقل الرصيد المبدئي
+    }
+
+    // دالة لتحديث قائمة المستخدمين المعروضة
+    function updateUserList() {
+      const usersListDiv = document.getElementById("users-list");
+      usersListDiv.innerHTML = "";  // مسح المحتوى الحالي
+      users.forEach(user => {
+        const userDiv = document.createElement("div");
+        userDiv.classList.add("user");
+        // عرض اسم المستخدم ورصيده بالريال
+        userDiv.innerHTML = `<span>${user.name}:</span> <span id="${user.name}-balance">${user.balance}</span> ريال`;
+        usersListDiv.appendChild(userDiv);
+      });
+    }
+
+    // دالة لتحديث القوائم المنسدلة للاختيار
+    function updateUserSelectors() {
+      const fromUserSelect = document.getElementById("from-user");
+      const toUserSelect = document.getElementById("to-user");
+
+      // مسح الخيارات الحالية
+      fromUserSelect.innerHTML = "";
+      toUserSelect.innerHTML = "";
+
+      users.forEach(user => {
+        const optionFrom = document.createElement("option");
+        optionFrom.value = user.name;
+        optionFrom.textContent = user.name;
+
+        const optionTo = document.createElement("option");
+        optionTo.value = user.name;
+        optionTo.textContent = user.name;
+
+        fromUserSelect.appendChild(optionFrom);
+        toUserSelect.appendChild(optionTo);
+      });
+    }
+
+    // دالة لتحويل المال بين المستخدمين
+    function transferMoney() {
+      const fromUserName = document.getElementById("from-user").value;
+      const toUserName = document.getElementById("to-user").value;
+      const amount = parseFloat(document.getElementById("amount").value);
+
+      if (fromUserName === toUserName) {
+        alert("لا يمكن تحويل المال لنفس الشخص.");
+        return;
+      }
+
+      const fromUser = users.find(user => user.name === fromUserName);
+      const toUser = users.find(user => user.name === toUserName);
+
+      if (fromUser.balance < amount) {
+        alert(`${fromUserName} ليس لديه رصيد كافٍ.`);
+        return;
+      }
+
+      // خصم المبلغ من رصيد المستخدم المرسل
+      fromUser.balance -= amount;
+
+      // إضافة المبلغ إلى رصيد المستخدم المستقبل
+      toUser.balance += amount;
+
+      // تحديث واجهة المستخدم
+      updateUserList();
+      alert("تم تحويل المال بنجاح!");
+    }
+
+    // تهيئة الواجهة بعد تحميل الصفحة
+    window.onload = function() {
+      updateUserList();
+      updateUserSelectors();
+    };
+  </script>
+</body>
+</html>
