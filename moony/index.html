@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة مانبولي</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <h1>لعبة مانبولي</h1>
+
+        <div id="session-controls">
+            <button id="create-session">إنشاء جلسة</button>
+            <input type="text" id="session-id" placeholder="أدخل معرف الجلسة" />
+            <button id="join-session">الانضمام إلى جلسة</button>
+        </div>
+
+        <div id="player-info">
+            <input type="text" id="player-color" placeholder="أدخل اللون الخاص بك" />
+            <button id="start-game">ابدأ اللعبة</button>
+        </div>
+
+        <div id="game-board">
+            <!-- سيتم إضافة اللوحة هنا -->
+        </div>
+
+        <div id="player-status">
+            <p>رصيدك: <span id="money-display">1500</span> دولار</p>
+        </div>
+
+        <button id="transfer-money">تحويل المال</button>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
